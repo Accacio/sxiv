@@ -465,22 +465,36 @@ void tns_render(tns_t *tns)
 
 void tns_mark(tns_t *tns, int n, bool mark)
 {
+  //todo change here
 	if (n >= 0 && n < *tns->cnt && tns->thumbs[n].im != NULL) {
+
 		win_t *win = tns->win;
 		thumb_t *t = &tns->thumbs[n];
 		unsigned long col = win->fullscreen ? win->black.pixel : win->bg.pixel;
-		int x = t->x + t->w, y = t->y + t->h;
+		int x = t->x + t->w -10, y = t->y + t->h -10;
 
 		win_draw_rect(win, x - 1, y + 1, 1, tns->bw, true, 1, col);
-		win_draw_rect(win, x + 1, y - 1, tns->bw, 1, true, 1, col);
+		win_draw_rect(win, x - 1, y + 1, tns->bw, 1, true, 1, col);
+                GC gc = XCreateGC(win->env.dpy, win->xwin, 0, None);
+
+                int num = 42;
+                int length = snprintf( NULL, 0, "%d", num );
+                char* str = malloc( length + 1 );
+                snprintf( str, length + 1, "%d", num );
+
+
 
 		if (mark)
-			col = win->fullscreen && win->light ? win->bg.pixel : win->fg.pixel;
+                  col = win->fullscreen && win->light ? win->bg.pixel : win->fg.pixel;
 
-		win_draw_rect(win, x, y, tns->bw + 2, tns->bw + 2, true, 1, col);
+		win_draw_rect(win, x, y, tns->bw + 10, tns->bw + 10, true, 1, col);
+                XDrawString(win->env.dpy, win->buf.pm, gc, x+2,y+11, str, length);
 
-		if (!mark && n == *tns->sel)
-			tns_highlight(tns, n, true);
+                if (!mark && n == *tns->sel){
+                  tns_highlight(tns, n, true);
+                  imlib_context_set_image(t->im);
+                  imlib_render_image_on_drawable_at_size(t->x, t->y, t->w, t->h);
+                }
 	}
 }
 
