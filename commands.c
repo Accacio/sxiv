@@ -48,19 +48,28 @@ extern int filecnt, fileidx;
 extern int alternate;
 extern int markcnt;
 extern int markidx;
+extern markednode_t *head;
+
 
 extern int prefix;
 extern bool extprefix;
 
 bool cg_quit(arg_t _)
 {
-	unsigned int i;
 
 	if (options->to_stdout && markcnt > 0) {
-		for (i = 0; i < filecnt; i++) {
-			if (files[i].flags & FF_MARK)
-				printf("%s\n", files[i].name);
-		}
+          // todo change here
+          markednode_t * current = head;
+          while (current->next != NULL) {
+            printf("%s\n", current->next->name);
+            current = current->next;
+          }
+          /* for (i = 0; i < filecnt; i++) { */
+	  /*       	if (files[i].flags & FF_MARK) */
+	  /*       		printf("%s\n", files[i].name); */
+	  /*       } */
+
+          
 	}
 	exit(EXIT_SUCCESS);
 }

@@ -58,6 +58,7 @@ int filecnt, fileidx;
 int alternate;
 int markcnt;
 int markidx;
+markednode_t * head = NULL;
 
 int prefix;
 bool extprefix;
@@ -327,7 +328,27 @@ bool mark_image(int n, bool on)
 	markidx = n;
 	if (!!(files[n].flags & FF_MARK) != on) {
 		files[n].flags ^= FF_MARK;
-		markcnt += on ? 1 : -1;
+
+		if (on) {
+                  // todo change thumb markindex
+                  markcnt +=1;
+                  tns.thumbs[n].markindex=markcnt;
+                  push(head, files[n].name, &tns.thumbs[n], n);
+                } else {
+                  markcnt -= 1;
+                  pop(head, files[n].name);
+                  markednode_t * current = head;
+                  int index = 0;
+                  while (current->next != NULL) {
+                    index++;
+                    current->next->thumb->markindex = index;
+                    tns_highlight(&tns, current->next->idx, false);
+                    current = current->next;
+                  }
+                  // render all thumbs again
+
+                }
+
 		if (mode == MODE_THUMB)
 			tns_mark(&tns, n, on);
 		return true;
@@ -851,6 +872,8 @@ int main(int argc, char **argv)
 	else
 		filecnt = options->filecnt;
 
+        head = emalloc(sizeof(*head));
+        head->next = NULL;
 	files = emalloc(filecnt * sizeof(*files));
 	memset(files, 0, filecnt * sizeof(*files));
 	fileidx = 0;

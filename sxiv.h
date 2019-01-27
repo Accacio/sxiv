@@ -302,6 +302,7 @@ typedef struct {
 	int h;
 	int x;
 	int y;
+        unsigned int markindex;
 } thumb_t;
 
 struct tns {
@@ -325,6 +326,13 @@ struct tns {
 
 	bool dirty;
 };
+
+typedef struct node {
+  const char * name;
+  struct node * next;
+  thumb_t * thumb;
+  int idx;
+} markednode_t;
 
 void tns_clean_cache(tns_t*);
 void tns_init(tns_t*, fileinfo_t*, const int*, int*, win_t*);
@@ -366,6 +374,8 @@ int r_opendir(r_dir_t*, const char*, bool);
 int r_closedir(r_dir_t*);
 char* r_readdir(r_dir_t*, bool);
 int r_mkdir(char*);
+void push(markednode_t*,const char*, thumb_t*, int);
+void pop(markednode_t*,const char*);
 
 
 /* window.c */

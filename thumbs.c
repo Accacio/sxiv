@@ -463,32 +463,35 @@ void tns_render(tns_t *tns)
 	tns_highlight(tns, *tns->sel, true);
 }
 
-void tns_mark(tns_t *tns, int n, bool mark)
-{
-  //todo change here
+void tns_mark(tns_t *tns, int n, bool mark) {
+
 	if (n >= 0 && n < *tns->cnt && tns->thumbs[n].im != NULL) {
-
-		win_t *win = tns->win;
+                win_t *win = tns->win;
 		thumb_t *t = &tns->thumbs[n];
-		unsigned long col = win->fullscreen ? win->black.pixel : win->bg.pixel;
-		int x = t->x + t->w -10, y = t->y + t->h -10;
 
-		win_draw_rect(win, x - 1, y + 1, 1, tns->bw, true, 1, col);
-		win_draw_rect(win, x - 1, y + 1, tns->bw, 1, true, 1, col);
+		unsigned long col = win->fullscreen ? win->black.pixel : win->bg.pixel;
+		int length = snprintf( NULL, 0, "%d", t->markindex );
+                char* str = malloc( length + 1 );
+                snprintf( str, length + 1, "%d", t->markindex );
                 GC gc = XCreateGC(win->env.dpy, win->xwin, 0, None);
 
-                int num = 42;
-                int length = snprintf( NULL, 0, "%d", num );
-                char* str = malloc( length + 1 );
-                snprintf( str, length + 1, "%d", num );
+                int square_h = 15 +length*2;
+                int square_w = square_h;
+                int x = t->x + t->w - square_w;
+                int y = t->y + t->h - square_h;
 
 
+                int h_1 = tns->bw +10 + length*2;
+                int w_1 = tns->bw + 10 + length*2;
+
+		// shadow
+                /* win_draw_rect(win, x - 2, y - 2, square_w+2, square_h+2, true, 1, col); */
 
 		if (mark)
                   col = win->fullscreen && win->light ? win->bg.pixel : win->fg.pixel;
 
-		win_draw_rect(win, x, y, tns->bw + 10, tns->bw + 10, true, 1, col);
-                XDrawString(win->env.dpy, win->buf.pm, gc, x+2,y+11, str, length);
+		win_draw_rect(win, x, y, square_w, square_h, true, 1, col);
+                XDrawString(win->env.dpy, win->buf.pm, gc, x+square_w/2-(length-1)*4, y+square_h*3/4, str, length);
 
                 if (!mark && n == *tns->sel){
                   tns_highlight(tns, n, true);

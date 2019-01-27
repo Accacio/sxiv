@@ -211,3 +211,34 @@ int r_mkdir(char *path)
 	return 0;
 }
 
+void push(markednode_t * head, const char * name, thumb_t * thumb, int idx) {
+  markednode_t * current = head;
+  while (current->next != NULL) {
+    current = current->next;
+  }
+
+  current->next = malloc(sizeof(markednode_t));
+  current->next->name = name;
+  current->next->thumb = thumb;
+  current->next->idx = idx;
+  current->next->next = NULL;
+}
+
+void pop(markednode_t * head, const char * name) {
+  int i = 0;
+  int retval = -1;
+  markednode_t * current = head;
+  markednode_t * temp_node = NULL;
+
+  while (current->next->name != name) {
+    if (current->next == NULL) {
+      return;
+    }
+    current = current->next;
+  }
+
+  temp_node = current->next;
+  current->next = temp_node->next;
+  free(temp_node);
+
+}
